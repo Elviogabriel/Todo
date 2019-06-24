@@ -4,7 +4,9 @@ header#main-header {
   font-size: 18px;
   font-weight: bold;
   color: black;
+  background: #b3b3b3;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 16px;
 }
