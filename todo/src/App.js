@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import moment from 'moment'
 import {
    Input, 
    List, 
@@ -7,7 +8,7 @@ import {
    Row,
    Col,
  } from 'antd';
-import "antd/dist/antd.css";
+import "antd/dist/antd.css"
 import Header from './components/header'
 
 
@@ -16,21 +17,36 @@ class FirstPage extends Component {
     super()
     this.state = {
       items: [],
-      newItems: '',
-      itemsSelected: [],
-      itemsSelectedKeys: false,
+      newItem: '',
     }
   }
 
-  handleChange = (e) => {
-    e.preventDefault()
-    const { items, newItems } = this.state
+  handleChange = () => {
+    const { items, newItem } = this.state
     this.setState({ 
-      items: [...items, newItems],
-      newItems: '',
-     });
-    console.log("state atualizado")
+      items: [
+        ...items,
+          {
+            title: newItem,
+            done: false,
+            startDate: moment(),
+            endDate: null,
+          }
+      ],
+      newItem: '',
+    });
   };
+
+  handleUpdate = (itemsSelected, status) => {
+    const { items } = this.state
+    this.setState({ 
+      items: items.map((item, index) => ({
+        ...item,
+        done: index === itemsSelected ? status : item.done,
+        endDate: index === itemsSelected ? status === true ? moment() : item.endDate : item.endDate
+      })),
+    });
+  }
 
   deleteItems = (e) => {
     e.preventDefault()
@@ -45,42 +61,46 @@ class FirstPage extends Component {
       const {itemsSelectedKeys} = this.state
       console.log('deletado')
       console.log(itemsSelectedKeys)
-    })
-    
-  }
+    }) 
+  };
 
   render() {
-    const { items, newItems } = this.state;
+    const { items, newItem } = this.state;
 
     return (
       <div className="first-page">
         <Header />
           <Input 
-            value={newItems} 
-            onChange={(e) => this.setState({newItems: e.target.value})} 
+            value={newItem} 
+            onChange={(e) => this.setState({newItem: e.target.value})} 
             type="text" 
             placeholder="Adicionar a sua ToDo list" 
             style={{ width: 230}} />
           <Button onClick={this.handleChange} type="primary">
             Adicionar
           </Button>
-          <Button type="danger" onClick={this.deleteItems}>
-            Excluir
-          </Button>
+          {/* <Button type="default" onClick={this.handleUpdate}>
+            Feito
+          </Button> */}
           <p style={{ marginBottom: 16 }}></p>
           <List
             size="small"
             bordered
             dataSource={items}
-            renderItem={item => (
+            renderItem={(item, index) => (
               <List.Item>
                 <Row guther={16}>
                   <Col span={4}>
-                    <Checkbox onChange={(e) => this.setState({itemsSelected: items.indexOf(item), itemsSelectedKeys: e.target.checked})}/>
+                    <Checkbox onChange={(e) => this.handleUpdate(index, e.target.checked)}/>
                   </Col>
                   <Col span={12}>
                     <List.Item.Meta
-                      title={item}
+                      key={item.title}
+                      title={item.title}
+                      description={'Data de inicio: ' 
+                        + moment(item.startDate).format("dddd, MMMM Do YYYY, h:mm:ss a") 
+                        + '\nData de término: ' 
+                        + moment(item.endDate).format("dddd, MMMM Do YYYY, h:mm:ss a")}
                       style={{ marginLeft: 16}}
                     />
                   </Col>
@@ -88,6 +108,7 @@ class FirstPage extends Component {
               </List.Item>
             )}
           />
+          <pre>{JSON.stringify(items, 2, 2)}</pre>
       </div>    
     )
   }
