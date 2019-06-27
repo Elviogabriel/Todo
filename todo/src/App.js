@@ -7,9 +7,9 @@ import {
    Checkbox,
    Row,
    Col,
+   PageHeader,
  } from 'antd';
 import "antd/dist/antd.css"
-import Header from './components/header'
 
 
 class FirstPage extends Component {
@@ -43,49 +43,31 @@ class FirstPage extends Component {
       items: items.map((item, index) => ({
         ...item,
         done: index === itemsSelected ? status : item.done,
-        endDate: index === itemsSelected ? status === true ? moment() : item.endDate : item.endDate
+        endDate: index === itemsSelected ? status === true ? moment() : item.endDate : item.endDate,
       })),
     });
   }
-
-  deleteItems = (e) => {
-    e.preventDefault()
-    const { items, itemsSelected } = this.state
-    console.log(itemsSelected)
-    items.splice(itemsSelected, 1)
-    this.setState({
-      items: [...items],
-      itemsSelected: [],
-      itemsSelectedKeys: false,
-    }, () => {
-      const {itemsSelectedKeys} = this.state
-      console.log('deletado')
-      console.log(itemsSelectedKeys)
-    }) 
-  };
 
   render() {
     const { items, newItem } = this.state;
 
     return (
       <div className="first-page">
-        <Header />
+        <PageHeader title="ToDo List" />
           <Input 
             value={newItem} 
-            onChange={(e) => this.setState({newItem: e.target.value})} 
+            onChange={(e) => this.setState({newItem: e.target.value})}
             type="text" 
             placeholder="Adicionar a sua ToDo list" 
             style={{ width: 230}} />
           <Button onClick={this.handleChange} type="primary">
             Adicionar
           </Button>
-          {/* <Button type="default" onClick={this.handleUpdate}>
-            Feito
-          </Button> */}
           <p style={{ marginBottom: 16 }}></p>
           <List
             size="small"
             bordered
+            itemLayout={"horizontal"}
             dataSource={items}
             renderItem={(item, index) => (
               <List.Item>
@@ -97,18 +79,17 @@ class FirstPage extends Component {
                     <List.Item.Meta
                       key={item.title}
                       title={item.title}
+                      style={{ textDecorationLine: item.done === true ? 'line-through' : "" }}
                       description={'Data de inicio: ' 
                         + moment(item.startDate).format("dddd, MMMM Do YYYY, h:mm:ss a") 
                         + '\nData de término: ' 
                         + moment(item.endDate).format("dddd, MMMM Do YYYY, h:mm:ss a")}
-                      style={{ marginLeft: 16}}
                     />
                   </Col>
                 </Row>
               </List.Item>
             )}
           />
-          <pre>{JSON.stringify(items, 2, 2)}</pre>
       </div>    
     )
   }
